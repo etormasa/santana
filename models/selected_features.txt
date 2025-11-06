@@ -1,0 +1,10 @@
+cp_asymptomatic	0.184337
+exang	0.131909
+cp_non-anginal pain	0.119118
+thal	0.108150
+slope	0.094005
+thalach	0.072018
+oldpeak	0.057238
+chol	0.054409
+ca	0.052775
+restecg	0.038156

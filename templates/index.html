@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Predicción de Enfermedad Cardíaca</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* === RESET BÁSICO === */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      background-color: #f7f8fa;
+      color: #222;
+    }
+
+    h1, h2, h3 {
+      color: #222;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      background-color: #fff;
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .info-card {
+      display: flex;
+      justify-content: space-between;
+      background: #f2f5f9;
+      border: 1px solid #e2e6ea;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .info-card div {
+      flex: 1 1 200px;
+      margin: 4px 0;
+    }
+
+    /* === RESULTADOS === */
+    .result {
+      background: #eafbee;
+      border: 1px solid #b6e0c0;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      color: #14532d;
+    }
+
+    .error {
+      background: #fde8e8;
+      border: 1px solid #f5b5b5;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      color: #b91c1c;
+      margin-bottom: 1.5rem;
+    }
+
+    /* === FORMULARIO === */
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+      outline: none;
+    }
+
+    button {
+      grid-column: 1 / -1;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Predicción de Enfermedad Cardíaca</h1>
+
+
+    {% if prediction %}
+    
+    <form method="POST" action="/predict">
+        {% for col in features %}
+        <div>
+            <label>{{ col }}</label>
+            {% if col in suggest_options %}
+            <select name="{{ col }}">
+                {% set current = (form_data[col] if form_data else '') | string %}
+                <option value="" {% if current == '' %}selected{% endif %} disabled>-- selecciona --</option>
+                {% for opt in suggest_options[col] %}
+                <option value="{{ opt }}" {% if current == opt %}selected{% endif %}>{{ opt }}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <input
+            type="text"
+            name="{{ col }}"
+            value="{{ form_data[col] if form_data else '' }}"
+            placeholder="{% if col in num_cols %}número{% else %}texto/categoría{% endif %}"
+            required
+            />
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit">Predecir</button>
+    </form>
+    
+    <div class="result">
+    <strong>Resultado de la predicción:</strong> {{ prediction }}<br>
+    {% if probability %}
+    <strong>Probabilidad estimada:</strong> {{ probability }}
+    {% endif %}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+<p class="footer-note">
+    Esta aplicación fue desarrollada con Flask y un modelo de aprendizaje automático entrenado con datos reales.<br>
+    El modelo se encarga de la imputación, escalado y selección de variables de manera interna.
+</p>
+</main>
+</body>
+</html>
