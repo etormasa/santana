@@ -9,9 +9,12 @@ from sklearn.utils.multiclass import type_of_target
 # === Rutas base ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODELS_DIR = os.path.join(BASE_DIR, "models")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 MODEL_PATH = os.path.join(MODELS_DIR, "model.pkl")
 
 # === Cargar modelo ===
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"No se encontró el modelo en: {MODEL_PATH}")
 model = joblib.load(MODEL_PATH)
 
 # === Descubrir CSV para obtener columnas originales ===
@@ -55,7 +58,8 @@ for c in cat_cols:
         # guarda como strings para que el form no truene
         suggest_options[c] = [str(v) for v in sorted(vals, key=lambda x: str(x))]
 
-app = Flask(__name__)
+# IMPORTANTE: indicar carpeta de templates explícitamente
+app = Flask(__name__, template_folder=TEMPLATES_DIR)
 
 @app.route("/", methods=["GET"])
 def index():
@@ -70,7 +74,6 @@ def index():
         target_name=target_col
     )
 
-@app.route("/predict", methods=["POST"])
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
@@ -139,7 +142,6 @@ def predict():
             error=str(e),
             form_data=request.form
         )
-
 
 if __name__ == "__main__":
     # Ejecutar: python app.py  → http://127.0.0.1:5000
